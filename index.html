@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1Ai-Agency – Command Center</title>
+<style>
+:root{--black:#0a0a0a;--dark:#111;--card:#181818;--border:#2a2a2a;--gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:#8a6d2f;--text:#f0f0f0;--text-dim:#888;--text-muted:#555;--green:#2ecc71;--blue:#3498db;--red:#e74c3c;--orange:#f39c12}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;background:var(--black);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.header{background:var(--dark);border-bottom:1px solid var(--border);padding:0 20px;height:58px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000}
+.logo-text{font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
+.header-mid{flex:1;display:flex;justify-content:center}
+.client-sel{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;position:relative;transition:border-color .2s}
+.client-sel:hover{border-color:var(--gold-dim)}
+.cdot{width:7px;height:7px;background:var(--green);border-radius:50%}
+.c-dd{display:none;position:absolute;top:110%;left:0;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:240px;z-index:999;overflow:hidden}
+.c-dd.open{display:block}
+.c-item{padding:10px 14px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;transition:background .15s}
+.c-item:hover{background:var(--border)}
+.c-item.active{color:var(--gold)}
+.c-add{padding:10px 14px;font-size:12px;color:var(--gold);border-top:1px solid var(--border);cursor:pointer}
+.c-add:hover{background:var(--border)}
+.header-right{display:flex;align-items:center;gap:10px}
+.rc{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--text-dim)}
+.rc select{background:transparent;border:none;color:var(--gold);font-size:12px;outline:none;cursor:pointer}
+.rc select option{background:var(--card)}
+.cd{font-size:11px;color:var(--gold-dim);min-width:28px}
+.btn{padding:7px 15px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:5px}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000}
+.btn-gold:hover{opacity:.9;transform:translateY(-1px)}
+.btn-out{background:transparent;border:1px solid var(--border);color:var(--text-dim)}
+.btn-out:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+/* STATS */
+.stats{background:var(--dark);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;gap:8px;flex-shrink:0;overflow-x:auto}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 18px;display:flex;align-items:center;gap:10px;min-width:130px;transition:border-color .2s}
+.sc:hover{border-color:var(--gold-dim)}
+.si{font-size:18px}
+.sn{font-size:20px;font-weight:800;color:var(--gold);line-height:1}
+.sl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* MAIN */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:290px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sb-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sb-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.sw{padding:9px 11px;border-bottom:1px solid var(--border)}
+.si2{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.si2:focus{border-color:var(--gold-dim)}
+.si2::placeholder{color:var(--text-muted)}
+.ftabs{display:flex;padding:7px 11px;gap:5px;border-bottom:1px solid var(--border)}
+.ftab{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--text-muted);background:transparent;transition:all .15s}
+.ftab.active{background:var(--gold);color:#000;border-color:var(--gold)}
+.ftab:hover:not(.active){border-color:var(--gold-dim);color:var(--gold)}
+.sl2{flex:1;overflow-y:auto}
+.si3{padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;display:flex;gap:9px;align-items:flex-start}
+.si3:hover{background:var(--card)}
+.si3.active{background:#1e1a0e;border-left:2px solid var(--gold)}
+.sav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#2a2a2a,#1a1a1a);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sb2{flex:1;min-width:0}
+.st{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.sid2{font-size:13px;font-weight:600}
+.stm{font-size:11px;color:var(--text-muted)}
+.sp{font-size:12px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.sb3{display:flex;justify-content:space-between;align-items:center}
+.sbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;border:none;transition:all .2s}
+.s-open{background:#2a1f00;color:var(--orange);border:1px solid #4a3800}
+.s-cont{background:#001a2a;color:var(--blue);border:1px solid #003050}
+.s-clos{background:#002a10;color:var(--green);border:1px solid #005020}
+.ubadge{background:var(--gold);color:#000;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
+
+/* CHAT */
+.chat{flex:1;display:flex;flex-direction:column;background:var(--black);overflow:hidden}
+.ch{background:var(--dark);border-bottom:1px solid var(--border);padding:11px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),#2a2a2a);display:flex;align-items:center;justify-content:center;font-size:15px}
+.chi h3{font-size:14px;font-weight:700}
+.chi p{font-size:11px;color:var(--text-dim)}
+.cha{margin-left:auto;display:flex;gap:8px}
+.mw{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:5px}
+.dd{text-align:center;margin:10px 0}
+.dd span{background:var(--card);border:1px solid var(--border);color:var(--text-muted);padding:3px 12px;border-radius:20px;font-size:11px}
+.mr{display:flex}
+.mr.user{justify-content:flex-start}
+.mr.bot{justify-content:flex-end}
+.bub{max-width:62%;padding:9px 13px;border-radius:12px}
+.bub.user{background:var(--card);border:1px solid var(--border);border-top-left-radius:3px}
+.bub.bot{background:#1a1500;border:1px solid #3a2e00;border-top-right-radius:3px}
+.bs{font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.bub.user .bs{color:var(--text-muted)}
+.bub.bot .bs{color:var(--gold)}
+.bt{font-size:14px;line-height:1.6;word-wrap:break-word}
+.btm{font-size:11px;color:var(--text-muted);text-align:right;margin-top:4px}
+
+/* LIVE CHAT */
+.lc{background:var(--dark);border-top:1px solid var(--border);padding:11px 18px;display:none;flex-direction:column;gap:7px;flex-shrink:0}
+.lc.vis{display:flex}
+.lcl{font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.lcr{display:flex;gap:9px}
+.lci{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s;resize:none;height:42px}
+.lci:focus{border-color:var(--gold-dim)}
+.sb4{background:linear-gradient(135deg,var(--gold),var(--gold-dim));border:none;border-radius:10px;padding:0 18px;color:#000;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .2s}
+.sb4:hover{opacity:.85}
+.sb4:disabled{opacity:.4;cursor:not-allowed}
+
+/* EMPTY */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text-muted)}
+.ei{font-size:60px;opacity:.25}
+.et{font-size:20px;font-weight:300;color:var(--text-dim)}
+.eg{color:var(--gold-dim);font-size:10px;text-transform:uppercase;letter-spacing:2px;margin-top:6px}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.md{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.md h2{font-size:17px;font-weight:700;margin-bottom:5px}
+.mds{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+.fg{margin-bottom:12px}
+.fl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.fi{width:100%;background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--gold-dim)}
+.ma{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+
+/* TOAST */
+.toast{position:fixed;top:18px;right:18px;background:var(--card);border:1px solid var(--gold-dim);border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:11px;z-index:3000;transform:translateX(120%);transition:transform .3s ease;max-width:300px;box-shadow:0 8px 30px rgba(0,0,0,.7)}
+.toast.show{transform:translateX(0)}
+.tttl{font-weight:700;color:var(--gold);font-size:13px}
+.tmsg{color:var(--text-dim);font-size:12px}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:28px;color:var(--text-muted);gap:9px;font-size:13px}
+.spin{width:17px;height:17px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold-dim)}
+@media(max-width:768px){.sidebar{width:100%;position:absolute;z-index:100;height:100%;transform:translateX(-100%);transition:transform .3s}.sidebar.open{transform:translateX(0)}.stats{display:none}.mmb{display:flex!important}}
+.mmb{display:none;background:none;border:none;color:var(--text);font-size:19px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">
+  <div style="font-size:18px">🔔</div>
+  <div><div class="tttl" id="tttl"></div><div class="tmsg" id="tmsg"></div></div>
+</div>
+
+<div class="mo" id="addModal">
+  <div class="md">
+    <h2>✨ Neuen Kunden hinzufügen</h2>
+    <p class="mds">Verbinde einen weiteren Chatbot</p>
+    <div class="fg"><label class="fl">Kundenname</label><input class="fi" id="nName" placeholder="z.B. Restaurant Müller"></div>
+    <div class="fg"><label class="fl">Google Sheet ID</label><input class="fi" id="nSheet" placeholder="1dFQR5..."></div>
+    <div class="fg"><label class="fl">Sheet Name</label><input class="fi" id="nSheetName" placeholder="ChatLogs" value="ChatLogs"></div>
+    <div class="fg"><label class="fl">Webhook URL</label><input class="fi" id="nWebhook" placeholder="https://..."></div>
+    <div class="ma">
+      <button class="btn btn-out" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-gold" onclick="saveClient()">✓ Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="header">
+  <button class="mmb" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+  <div class="logo">
+    <div class="logo-icon">1A</div>
+    <div><div class="logo-text">1Ai-Agency</div><div class="logo-sub">Command Center</div></div>
+  </div>
+  <div class="header-mid">
+    <div class="client-sel" id="csel" onclick="toggleDD()">
+      <div class="cdot"></div>
+      <span id="cname">1Ai-Agency (Haupt)</span>
+      <span style="color:var(--gold-dim);font-size:10px">▼</span>
+      <div class="c-dd" id="cdd">
+        <div id="clist"></div>
+        <div class="c-add" onclick="openModal(event)">+ Neuen Kunden hinzufügen</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="rc">
+      <span style="font-size:11px">🔄</span>
+      <select id="rint" onchange="setAR()">
+        <option value="0">Aus</option>
+        <option value="60">1 Min</option>
+        <option value="300" selected>5 Min</option>
+        <option value="600">10 Min</option>
+        <option value="1800">30 Min</option>
+      </select>
+      <span class="cd" id="cd"></span>
+    </div>
+    <button class="btn btn-gold" onclick="loadData()">↻ Aktualisieren</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="sc"><div class="si">💬</div><div><div class="sn" id="s1">–</div><div class="sl">Nachrichten</div></div></div>
+  <div class="sc"><div class="si">👥</div><div><div class="sn" id="s2">–</div><div class="sl">Sessions</div></div></div>
+  <div class="sc"><div class="si">📅</div><div><div class="sn" id="s3">–</div><div class="sl">Heute</div></div></div>
+  <div class="sc"><div class="si">🟡</div><div><div class="sn" id="s4">–</div><div class="sl">Offen</div></div></div>
+  <div class="sc"><div class="si">✅</div><div><div class="sn" id="s5">–</div><div class="sl">Abgeschlossen</div></div></div>
+  <div class="sc"><div class="si">⚡</div><div><div class="sn" id="s6">–</div><div class="sl">Erfolgsrate</div></div></div>
+</div>
+
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-hdr"><span class="sb-title">Konversationen</span><span style="font-size:11px;color:var(--text-muted)" id="sc2">0</span></div>
+    <div class="sw"><input class="si2" id="srch" placeholder="🔍 Suchen..." oninput="filterSessions()"></div>
+    <div class="ftabs">
+      <button class="ftab active" onclick="setFilter('all',this)">Alle</button>
+      <button class="ftab" onclick="setFilter('open',this)">Offen</button>
+      <button class="ftab" onclick="setFilter('contacted',this)">Kontaktiert</button>
+      <button class="ftab" onclick="setFilter('closed',this)">Abgeschlossen</button>
+    </div>
+    <div class="sl2" id="sl2"><div class="loading"><div class="spin"></div> Lade...</div></div>
+  </div>
+  <div class="chat" id="chat">
+    <div class="empty"><div class="ei">⚡</div><div class="et">Command Center bereit</div><div style="font-size:13px;color:var(--text-muted)">Wähle eine Konversation</div><div class="eg">1Ai-Agency · All Rights Reserved</div></div>
+  </div>
+</div>
+
+<script>
+const API_KEY='AIzaSyDf-SbGSAcru4TgyV8PPjmrYOt5hISLMAQ';
+const DEFAULT_WH='https://oneai-agency.app.n8n.cloud/webhook/1ai-chat';
+let clients=JSON.parse(localStorage.getItem('1ai_c')||'null')||[{id:'d',name:'1Ai-Agency (Haupt)',sheetId:'1dFQR5sfupnPRPhHW6HvWPV2oen6knrYUsZN3wapFIUM',sheetName:'ChatLogs',webhook:DEFAULT_WH}];
+let ci=0,allData=[],sessions={},statuses=JSON.parse(localStorage.getItem('1ai_st')||'{}'),read=new Set(JSON.parse(localStorage.getItem('1ai_r')||'[]')),deleted=new Set(JSON.parse(localStorage.getItem('1ai_del')||'[]')),cur=null,filtered=[],filter='all',arTimer=null,cdTimer=null,cdVal=0;
+
+function toggleDD(){document.getElementById('cdd').classList.toggle('open');renderCL()}
+document.addEventListener('click',e=>{if(!e.target.closest('#csel'))document.getElementById('cdd').classList.remove('open')});
+function renderCL(){document.getElementById('clist').innerHTML=clients.map((c,i)=>`<div class="c-item ${i===ci?'active':''}" onclick="swClient(${i})"><div class="cdot" style="background:${i===ci?'var(--gold)':'var(--text-muted)'}"></div>${c.name}</div>`).join('')}
+function swClient(i){ci=i;document.getElementById('cname').textContent=clients[i].name;document.getElementById('cdd').classList.remove('open');cur=null;loadData()}
+function openModal(e){e.stopPropagation();document.getElementById('addModal').classList.add('open');document.getElementById('cdd').classList.remove('open')}
+function closeModal(){document.getElementById('addModal').classList.remove('open')}
+function saveClient(){const n=document.getElementById('nName').value.trim(),s=document.getElementById('nSheet').value.trim(),sn=document.getElementById('nSheetName').value.trim()||'ChatLogs',w=document.getElementById('nWebhook').value.trim();if(!n||!s){alert('Name und Sheet ID fehlen!');return}clients.push({id:Date.now(),name:n,sheetId:s,sheetName:sn,webhook:w});localStorage.setItem('1ai_c',JSON.stringify(clients));closeModal();toast('✅ Gespeichert',n+' hinzugefügt!')}
+
+async function loadData(){
+  const c=clients[ci];
+  document.getElementById('sl2').innerHTML='<div class="loading"><div class="spin"></div> Lade...</div>';
+  try{
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${c.sheetId}/values/${c.sheetName}?key=${API_KEY}`);
+    const j=await r.json();
+    if(j.error)throw new Error(j.error.message);
+    const prev=allData.length;
+    allData=(j.values||[]).slice(1).filter(r=>r[0]).map(r=>({ts:r[0]||'',sid:r[1]||'?',um:r[2]||'',br:r[3]||'',st:r[4]||'success'}));
+    if(prev>0&&allData.length>prev){const n=allData.length-prev;toast('🔔 Neue Nachricht!',n+' neue Nachricht'+(n>1?'en':'')+' eingegangen');if(Notification.permission==='granted')new Notification('1Ai-Agency',{body:n+' neue Nachricht'+(n>1?'en':'')})}
+    proc();updateStats();renderSessions();
+    if(cur&&sessions[cur])openSession(cur,true);
+  }catch(e){document.getElementById('sl2').innerHTML=`<div class="loading">❌ ${e.message}</div>`}
+}
+
+function proc(){sessions={};allData.forEach(r=>{if(!sessions[r.sid])sessions[r.sid]={msgs:[],ft:r.ts,lt:r.ts};sessions[r.sid].msgs.push(r);sessions[r.sid].lt=r.ts});filtered=Object.keys(sessions).filter(s=>!deleted.has(s))}
+
+function updateStats(){
+  const sids=Object.keys(sessions).filter(s=>!deleted.has(s));
+  document.getElementById('s1').textContent=allData.filter(r=>r.um).length;
+  document.getElementById('s2').textContent=sids.length;
+  const td=new Date().toDateString();
+  document.getElementById('s3').textContent=allData.filter(r=>{try{return new Date(r.ts).toDateString()===td}catch{return false}}).length;
+  document.getElementById('s4').textContent=sids.filter(s=>(statuses[s]||'open')==='open').length;
+  document.getElementById('s5').textContent=sids.filter(s=>statuses[s]==='closed').length;
+  const sc=allData.filter(r=>!r.st||r.st==='success').length;
+  document.getElementById('s6').textContent=allData.length>0?Math.round(sc/allData.length*100)+'%':'–';
+}
+
+function setFilter(f,el){filter=f;document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderSessions()}
+
+function renderSessions(){
+  const cont=document.getElementById('sl2');
+  let sids=filtered;
+  if(filter!=='all')sids=sids.filter(s=>(statuses[s]||'open')===filter);
+  document.getElementById('sc2').textContent=sids.length;
+  if(!sids.length){cont.innerHTML='<div class="loading">Keine Sessions</div>';return}
+  const sl={'open':'● Offen','contacted':'● Kontaktiert','closed':'✓ Erledigt'};
+  const sc={'open':'s-open','contacted':'s-cont','closed':'s-clos'};
+  cont.innerHTML=sids.map(sid=>{
+    const s=sessions[sid],lm=s.msgs[s.msgs.length-1],mc=s.msgs.filter(m=>m.um).length,pr=lm.um||'...',st=statuses[sid]||'open',isR=read.has(sid);
+    return`<div class="si3 ${cur===sid?'active':''}" onclick="openSession('${sid}')">
+      <div class="sav">👤</div>
+      <div class="sb2">
+        <div class="st"><div class="sid2">${sid.substring(0,8)}...</div><div class="stm">${fDate(lm.ts)}</div></div>
+        <div class="sp">${pr.substring(0,40)}${pr.length>40?'...':''}</div>
+        <div class="sb3">
+          <button class="sbadge ${sc[st]}" onclick="cycleStatus(event,'${sid}')">${sl[st]}</button>
+          <div style="display:flex;gap:5px;align-items:center">
+            ${!isR&&mc>0?`<span class="ubadge">${mc}</span>`:''}
+            <span onclick="delSess(event,'${sid}')" style="cursor:pointer;color:var(--text-muted);font-size:13px" title="Löschen">🗑</span>
+          </div>
+        </div>
+      </div>
+    </div>`}).join('')
+}
+
+function cycleStatus(e,sid){e.stopPropagation();const cy={'open':'contacted','contacted':'closed','closed':'open'};statuses[sid]=cy[statuses[sid]||'open'];localStorage.setItem('1ai_st',JSON.stringify(statuses));renderSessions();updateStats();const lb={'open':'Offen','contacted':'Kontaktiert','closed':'Abgeschlossen'};toast('📋 Status',`→ ${lb[statuses[sid]]}`)}
+
+function delSess(e,sid){e.stopPropagation();if(!confirm('Session löschen?'))return;deleted.add(sid);localStorage.setItem('1ai_del',JSON.stringify([...deleted]));filtered=filtered.filter(s=>s!==sid);if(cur===sid){cur=null;document.getElementById('chat').innerHTML=emptyHTML()}renderSessions();updateStats()}
+
+function openSession(sid,silent=false){
+  cur=sid;
+  if(!silent){read.add(sid);localStorage.setItem('1ai_r',JSON.stringify([...read]))}
+  renderSessions();
+  const s=sessions[sid],mc=s.msgs.filter(m=>m.um).length,c=clients[ci];
+  let h=`<div class="ch"><div class="chav">👤</div><div class="chi"><h3>Session: ${sid.substring(0,12)}...</h3><p>${mc} Nachrichten · ${fDate(s.ft)} · ${c.name}</p></div><div class="cha"><button class="btn btn-out" onclick="toggleLC()" id="lcbtn">💬 Live Chat</button></div></div><div class="mw" id="mw">`;
+  let ld='';
+  s.msgs.forEach(m=>{
+    const d=fDate(m.ts);
+    if(d!==ld){h+=`<div class="dd"><span>${d}</span></div>`;ld=d}
+    if(m.um)h+=`<div class="mr user"><div class="bub user"><div class="bs">👤 Kunde</div><div class="bt">${esc(m.um)}</div><div class="btm">${fTime(m.ts)}</div></div></div>`;
+    if(m.br){const cl=m.br.replace(/<<<JSON_START>>>[\s\S]*?<<<JSON_END>>>/g,'').trim();if(cl)h+=`<div class="mr bot"><div class="bub bot"><div class="bs">🤖 1Ai Bot</div><div class="bt">${esc(cl)}</div><div class="btm">${fTime(m.ts)} ✓</div></div></div>`}
+  });
+  h+=`</div><div class="lc" id="lc"><div class="lcl">⚡ Live Antwort senden</div><div class="lcr"><textarea class="lci" id="lci" placeholder="Nachricht eingeben..." onkeydown="lcKey(event)"></textarea><button class="sb4" onclick="sendLC()" id="sbtn">Senden ➤</button></div></div>`;
+  document.getElementById('chat').innerHTML=h;
+  setTimeout(()=>{const w=document.getElementById('mw');if(w)w.scrollTop=w.scrollHeight},50);
+}
+
+function toggleLC(){const lc=document.getElementById('lc');lc.classList.toggle('vis');document.getElementById('lcbtn').textContent=lc.classList.contains('vis')?'✕ Schließen':'💬 Live Chat'}
+function lcKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendLC()}}
+async function sendLC(){
+  const inp=document.getElementById('lci'),msg=inp.value.trim();
+  if(!msg)return;
+  const btn=document.getElementById('sbtn');btn.disabled=true;btn.textContent='...';
+  const c=clients[ci];
+  try{
+    await fetch(c.webhook||DEFAULT_WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId:cur,source:'dashboard'})});
+    inp.value='';toast('✅ Gesendet!','Nachricht erfolgreich gesendet');
+    setTimeout(()=>loadData(),2000);
+  }catch(e){toast('❌ Fehler','Senden fehlgeschlagen')}
+  btn.disabled=false;btn.textContent='Senden ➤';
+}
+
+function filterSessions(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  filtered=Object.keys(sessions).filter(sid=>{
+    if(deleted.has(sid))return false;
+    if(!q)return true;
+    const s=sessions[sid];
+    return sid.toLowerCase().includes(q)||s.msgs.some(m=>(m.um||'').toLowerCase().includes(q)||(m.br||'').toLowerCase().includes(q));
+  });
+  renderSessions();
+}
+
+function setAR(){clearInterval(arTimer);clearInterval(cdTimer);document.getElementById('cd').textContent='';const s=parseInt(document.getElementById('rint').value);if(!s)return;cdVal=s;cdTimer=setInterval(()=>{cdVal--;document.getElementById('cd').textContent=cdVal+'s';if(cdVal<=0){cdVal=s;loadData()}},1000)}
+
+function fTime(ts){if(!ts)return'';try{return new Date(ts).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}catch{return''}}
+function fDate(ts){if(!ts)return'';try{const d=new Date(ts),t=new Date();if(d.toDateString()===t.toDateString())return'Heute';return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}catch{return ts}}
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function emptyHTML(){return`<div class="empty"><div class="ei">⚡</div><div class="et">Command Center bereit</div><div style="font-size:13px;color:var(--text-muted)">Wähle eine Konversation</div><div class="eg">1Ai-Agency · All Rights Reserved</div></div>`}
+function toast(t,m){document.getElementById('tttl').textContent=t;document.getElementById('tmsg').textContent=m;const el=document.getElementById('toast');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500)}
+
+if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+loadData();setAR();
+</script>
+</body>
+</html>
