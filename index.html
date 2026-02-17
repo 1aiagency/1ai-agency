@@ -9,6 +9,7 @@
 <meta name="theme-color" content="#c9a84c">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-512.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <title>1Ai-Agency – Command Center</title>
 <style>
 :root{--black:#0a0a0a;--dark:#111;--card:#181818;--border:#2a2a2a;--gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:#8a6d2f;--text:#f0f0f0;--text-dim:#888;--text-muted:#555;--green:#2ecc71;--blue:#3498db;--red:#e74c3c;--orange:#f39c12}
@@ -170,6 +171,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   </div>
 </div>
 
+<!-- Top Questions Modal -->
+<div class="mo" id="topQModal">
+  <div class="md" style="width:600px;max-height:80vh;overflow-y:auto">
+    <h2>❓ Top 10 Häufigste Fragen</h2>
+    <p class="mds">Die am meisten gestellten Fragen deiner Leads</p>
+    <div id="topQList" style="margin-top:20px"></div>
+    <div class="ma" style="margin-top:20px">
+      <button class="btn btn-gold" onclick="document.getElementById('topQModal').classList.remove('open')">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Management Modal -->
+<div class="mo" id="teamModal">
+  <div class="md" style="width:500px">
+    <h2>👥 Team Management</h2>
+    <p class="mds">Verwalte deine Team Mitglieder</p>
+    <div id="teamList" style="margin-top:20px"></div>
+    <div class="ma" style="margin-top:20px">
+      <button class="btn btn-out" onclick="addTeamMember()">+ Mitglied hinzufügen</button>
+      <button class="btn btn-gold" onclick="document.getElementById('teamModal').classList.remove('open')">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Performance Rankings Modal -->
+<div class="mo" id="rankingsModal">
+  <div class="md" style="width:700px;max-height:80vh;overflow-y:auto">
+    <h2>🏆 Performance Rankings</h2>
+    <p class="mds">Die besten und schlechtesten Sessions basierend auf Quality Score</p>
+    <div id="rankingsList" style="margin-top:20px"></div>
+    <div class="ma" style="margin-top:20px">
+      <button class="btn btn-gold" onclick="document.getElementById('rankingsModal').classList.remove('open')">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Optimization Modal -->
+<div class="mo" id="aiOptModal">
+  <div class="md" style="width:800px;max-height:80vh;overflow-y:auto">
+    <h2>🤖 AI Optimization Panel</h2>
+    <p class="mds">Welche Prompts & Wörter konvertieren am besten</p>
+    <div id="aiOptContent" style="margin-top:20px"></div>
+    <div class="ma" style="margin-top:20px">
+      <button class="btn btn-gold" onclick="document.getElementById('aiOptModal').classList.remove('open')">Schließen</button>
+    </div>
+  </div>
+</div>
+
 <div class="header">
   <button class="mmb" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
   <div class="logo">
@@ -188,6 +238,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     </div>
   </div>
   <div class="header-right">
+    <button class="btn btn-out" onclick="showAIOptimization()" style="font-size:11px;padding:6px 12px">🤖 AI Insights</button>
+    <button class="btn btn-out" onclick="showRankings()" style="font-size:11px;padding:6px 12px">🏆 Rankings</button>
+    <button class="btn btn-out" onclick="showTeam()" style="font-size:11px;padding:6px 12px">👥 Team</button>
+    <button class="btn btn-out" onclick="showTopQ()" style="font-size:11px;padding:6px 12px">❓ Top 10</button>
     <div class="rc">
       <span style="font-size:11px">🔄</span>
       <select id="rint" onchange="setAR()">
@@ -210,6 +264,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <div class="sc"><div class="si">🟡</div><div><div class="sn" id="s4">–</div><div class="sl">Offen</div></div></div>
   <div class="sc"><div class="si">✅</div><div><div class="sn" id="s5">–</div><div class="sl">Abgeschlossen</div></div></div>
   <div class="sc"><div class="si">⚡</div><div><div class="sn" id="s6">–</div><div class="sl">Erfolgsrate</div></div></div>
+  <div class="sc"><div class="si">⏱️</div><div><div class="sn" id="s7">–</div><div class="sl">Avg Response</div></div></div>
+  <div class="sc"><div class="si">⏰</div><div><div class="sn" id="s8">–</div><div class="sl">Avg Duration</div></div></div>
+  <div class="sc"><div class="si">📉</div><div><div class="sn" id="s9">–</div><div class="sl">Drop-off</div></div></div>
+  <div class="sc"><div class="si">🔥</div><div><div class="sn" id="s10">–</div><div class="sl">Peak Hour</div></div></div>
+  <div class="sc"><div class="si">🎯</div><div><div class="sn" id="s11">–</div><div class="sl">Conversion</div></div></div>
 </div>
 
 <div class="main">
@@ -234,6 +293,11 @@ const API_KEY='AIzaSyDf-SbGSAcru4TgyV8PPjmrYOt5hISLMAQ';
 const DEFAULT_WH='https://oneai-agency.app.n8n.cloud/webhook/1ai-chat';
 let clients=JSON.parse(localStorage.getItem('1ai_c')||'null')||[{id:'d',name:'1Ai-Agency (Haupt)',sheetId:'1dFQR5sfupnPRPhHW6HvWPV2oen6knrYUsZN3wapFIUM',sheetName:'ChatLogs',webhook:DEFAULT_WH}];
 let ci=0,allData=[],sessions={},statuses=JSON.parse(localStorage.getItem('1ai_st')||'{}'),read=new Set(JSON.parse(localStorage.getItem('1ai_r')||'[]')),deleted=new Set(JSON.parse(localStorage.getItem('1ai_del')||'[]')),cur=null,filtered=[],filter='all',arTimer=null,cdTimer=null,cdVal=0;
+let assignments=JSON.parse(localStorage.getItem('1ai_assign')||'{}');
+let notes=JSON.parse(localStorage.getItem('1ai_notes')||'{}');
+let teamMembers=JSON.parse(localStorage.getItem('1ai_team')||'null')||[
+  {id:'you',name:'Du',online:true,chats:0}
+];
 
 function toggleDD(){document.getElementById('cdd').classList.toggle('open');renderCL()}
 document.addEventListener('click',e=>{if(!e.target.closest('#csel'))document.getElementById('cdd').classList.remove('open')});
@@ -258,7 +322,49 @@ async function loadData(){
   }catch(e){document.getElementById('sl2').innerHTML=`<div class="loading">❌ ${e.message}</div>`}
 }
 
-function proc(){sessions={};allData.forEach(r=>{if(!sessions[r.sid])sessions[r.sid]={msgs:[],ft:r.ts,lt:r.ts};sessions[r.sid].msgs.push(r);sessions[r.sid].lt=r.ts});filtered=Object.keys(sessions).filter(s=>!deleted.has(s))}
+function proc(){
+  sessions={};
+  allData.forEach(r=>{
+    if(!sessions[r.sid])sessions[r.sid]={msgs:[],ft:r.ts,lt:r.ts,score:0};
+    sessions[r.sid].msgs.push(r);
+    sessions[r.sid].lt=r.ts;
+  });
+  
+  // Calculate Quality Scores
+  Object.keys(sessions).forEach(sid=>{
+    const s=sessions[sid];
+    let score=0;
+    
+    // Engagement Score (0-30 points)
+    const msgCount=s.msgs.filter(m=>m.um).length;
+    score+=Math.min(msgCount*5,30);
+    
+    // Completion Score (0-25 points)
+    const hasResponse=s.msgs.length>=2&&s.msgs[s.msgs.length-1].br;
+    if(hasResponse)score+=25;
+    
+    // Response Quality Score (0-20 points)
+    const avgMsgLength=s.msgs.filter(m=>m.um).reduce((sum,m)=>(m.um?.length||0)+sum,0)/Math.max(msgCount,1);
+    if(avgMsgLength>20)score+=20;
+    else if(avgMsgLength>10)score+=10;
+    
+    // Duration Score (0-15 points)
+    try{
+      const duration=(new Date(s.lt).getTime()-new Date(s.ft).getTime())/60000;
+      if(duration>2&&duration<20)score+=15;
+      else if(duration>1)score+=10;
+    }catch{}
+    
+    // Success Score (0-10 points)
+    const allSuccess=s.msgs.every(m=>!m.st||m.st==='success');
+    if(allSuccess)score+=10;
+    
+    sessions[sid].score=Math.min(score,100);
+    sessions[sid].quality=score>=70?'high':score>=40?'medium':'low';
+  });
+  
+  filtered=Object.keys(sessions).filter(s=>!deleted.has(s));
+}
 
 function updateStats(){
   const sids=Object.keys(sessions).filter(s=>!deleted.has(s));
@@ -270,6 +376,62 @@ function updateStats(){
   document.getElementById('s5').textContent=sids.filter(s=>statuses[s]==='closed').length;
   const sc=allData.filter(r=>!r.st||r.st==='success').length;
   document.getElementById('s6').textContent=allData.length>0?Math.round(sc/allData.length*100)+'%':'–';
+  
+  // Advanced Stats
+  // Response Time
+  let respTimes=[];
+  sids.forEach(sid=>{
+    const msgs=sessions[sid].msgs;
+    for(let i=0;i<msgs.length-1;i++){
+      if(msgs[i].um&&msgs[i+1].br){
+        try{
+          const t1=new Date(msgs[i].ts).getTime();
+          const t2=new Date(msgs[i+1].ts).getTime();
+          respTimes.push((t2-t1)/1000);
+        }catch{}
+      }
+    }
+  });
+  const avgResp=respTimes.length>0?Math.round(respTimes.reduce((a,b)=>a+b,0)/respTimes.length):0;
+  document.getElementById('s7').textContent=avgResp>0?avgResp+'s':'–';
+  
+  // Chat Duration
+  let durations=[];
+  sids.forEach(sid=>{
+    try{
+      const ft=new Date(sessions[sid].ft).getTime();
+      const lt=new Date(sessions[sid].lt).getTime();
+      durations.push((lt-ft)/60000);
+    }catch{}
+  });
+  const avgDur=durations.length>0?Math.round(durations.reduce((a,b)=>a+b,0)/durations.length):0;
+  document.getElementById('s8').textContent=avgDur>0?avgDur+'min':'–';
+  
+  // Drop-off Rate
+  const totalConv=sids.length;
+  const completed=sids.filter(s=>{
+    const msgs=sessions[s].msgs;
+    return msgs.length>=3&&msgs[msgs.length-1].br;
+  }).length;
+  const dropOff=totalConv>0?Math.round(((totalConv-completed)/totalConv)*100):0;
+  document.getElementById('s9').textContent=dropOff+'%';
+  
+  // Peak Hour
+  const hours={};
+  allData.forEach(r=>{
+    try{
+      const h=new Date(r.ts).getHours();
+      hours[h]=(hours[h]||0)+1;
+    }catch{}
+  });
+  let peak=0,peakH=0;
+  Object.keys(hours).forEach(h=>{if(hours[h]>peak){peak=hours[h];peakH=h}});
+  document.getElementById('s10').textContent=peakH>0?peakH+':00':'–';
+  
+  // Conversion Rate
+  const qualified=sids.filter(s=>statuses[s]==='closed').length;
+  const convRate=totalConv>0?Math.round((qualified/totalConv)*100):0;
+  document.getElementById('s11').textContent=convRate+'%';
 }
 
 function setFilter(f,el){filter=f;document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderSessions()}
@@ -284,15 +446,27 @@ function renderSessions(){
   const sc={'open':'s-open','contacted':'s-cont','closed':'s-clos'};
   cont.innerHTML=sids.map(sid=>{
     const s=sessions[sid],lm=s.msgs[s.msgs.length-1],mc=s.msgs.filter(m=>m.um).length,pr=lm.um||'...',st=statuses[sid]||'open',isR=read.has(sid);
+    const assignedTo=assignments[sid]?teamMembers.find(t=>t.id===assignments[sid])?.name||'Unbekannt':null;
+    const qColor=s.quality==='high'?'var(--green)':s.quality==='medium'?'var(--orange)':'var(--red)';
+    const qIcon=s.quality==='high'?'🟢':s.quality==='medium'?'🟡':'🔴';
     return`<div class="si3 ${cur===sid?'active':''}" onclick="openSession('${sid}')">
       <div class="sav">👤</div>
       <div class="sb2">
-        <div class="st"><div class="sid2">${sid.substring(0,8)}...</div><div class="stm">${fDate(lm.ts)}</div></div>
+        <div class="st">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="sid2">${sid.substring(0,8)}...</div>
+            <span style="font-size:10px" title="Quality Score: ${s.score}/100">${qIcon}</span>
+            ${assignedTo?`<span style="font-size:10px;background:var(--gold-dim);color:#000;padding:2px 6px;border-radius:10px;font-weight:700">👤 ${assignedTo}</span>`:''}
+          </div>
+          <div class="stm">${fDate(lm.ts)}</div>
+        </div>
         <div class="sp">${pr.substring(0,40)}${pr.length>40?'...':''}</div>
         <div class="sb3">
           <button class="sbadge ${sc[st]}" onclick="cycleStatus(event,'${sid}')">${sl[st]}</button>
           <div style="display:flex;gap:5px;align-items:center">
             ${!isR&&mc>0?`<span class="ubadge">${mc}</span>`:''}
+            <span onclick="assignChat(event,'${sid}')" style="cursor:pointer;color:var(--gold-dim);font-size:13px" title="Zuweisen">👤</span>
+            <span onclick="openWhatsApp(event,'${sid}')" style="cursor:pointer;color:#25D366;font-size:14px" title="WhatsApp">💬</span>
             <span onclick="delSess(event,'${sid}')" style="cursor:pointer;color:var(--text-muted);font-size:13px" title="Löschen">🗑</span>
           </div>
         </div>
@@ -303,6 +477,37 @@ function renderSessions(){
 function cycleStatus(e,sid){e.stopPropagation();const cy={'open':'contacted','contacted':'closed','closed':'open'};statuses[sid]=cy[statuses[sid]||'open'];localStorage.setItem('1ai_st',JSON.stringify(statuses));renderSessions();updateStats();const lb={'open':'Offen','contacted':'Kontaktiert','closed':'Abgeschlossen'};toast('📋 Status',`→ ${lb[statuses[sid]]}`)}
 
 function delSess(e,sid){e.stopPropagation();if(!confirm('Session löschen?'))return;deleted.add(sid);localStorage.setItem('1ai_del',JSON.stringify([...deleted]));filtered=filtered.filter(s=>s!==sid);if(cur===sid){cur=null;document.getElementById('chat').innerHTML=emptyHTML()}renderSessions();updateStats()}
+
+function openWhatsApp(e,sid){
+  e.stopPropagation();
+  const s=sessions[sid];
+  if(!s)return;
+  const lastMsg=s.msgs[s.msgs.length-1];
+  const preview=lastMsg.um||'Keine Nachricht';
+  const msg=`Hallo! 👋\n\nIch kontaktiere dich bezüglich deiner Anfrage vom ${fDate(lastMsg.ts)}.\n\nDeine Nachricht: "${preview.substring(0,100)}${preview.length>100?'...':''}"\n\nWie kann ich dir weiterhelfen?\n\nViele Grüße\n1Ai-Agency`;
+  const encoded=encodeURIComponent(msg);
+  window.open(`https://wa.me/?text=${encoded}`,'_blank');
+}
+
+function assignChat(e,sid){
+  e.stopPropagation();
+  const current=assignments[sid];
+  const options=teamMembers.map((m,i)=>`${i+1}. ${m.name}${current===m.id?' (aktuell)':''}`).join('\n');
+  const choice=prompt(`Chat zuweisen an:\n\n${options}\n\nNummer eingeben (0 für nicht zugewiesen):`);
+  if(choice===null)return;
+  const idx=parseInt(choice)-1;
+  if(idx===-1){
+    delete assignments[sid];
+  }else if(idx>=0&&idx<teamMembers.length){
+    assignments[sid]=teamMembers[idx].id;
+  }else{
+    alert('Ungültige Auswahl!');
+    return;
+  }
+  localStorage.setItem('1ai_assign',JSON.stringify(assignments));
+  renderSessions();
+  toast('👤 Zugewiesen',assignments[sid]?`Chat an ${teamMembers.find(t=>t.id===assignments[sid]).name} zugewiesen`:'Zuweisung entfernt');
+}
 
 function openSession(sid,silent=false){
   cur=sid;
@@ -317,13 +522,32 @@ function openSession(sid,silent=false){
     if(m.um)h+=`<div class="mr user"><div class="bub user"><div class="bs">👤 Kunde</div><div class="bt">${esc(m.um)}</div><div class="btm">${fTime(m.ts)}</div></div></div>`;
     if(m.br){const cl=m.br.replace(/<<<JSON_START>>>[\s\S]*?<<<JSON_END>>>/g,'').trim();if(cl)h+=`<div class="mr bot"><div class="bub bot"><div class="bs">🤖 1Ai Bot</div><div class="bt">${esc(cl)}</div><div class="btm">${fTime(m.ts)} ✓</div></div></div>`}
   });
-  h+=`</div><div class="lc" id="lc"><div class="lcl">⚡ Live Antwort senden</div><div class="lcr"><textarea class="lci" id="lci" placeholder="Nachricht eingeben..." onkeydown="lcKey(event)"></textarea><button class="sb4" onclick="sendLC()" id="sbtn">Senden ➤</button></div></div>`;
+  h+=`</div>
+    <div class="lc" id="lc">
+      <div class="lcl">⚡ Live Antwort senden</div>
+      <div class="lcr"><textarea class="lci" id="lci" placeholder="Nachricht eingeben..." onkeydown="lcKey(event)"></textarea><button class="sb4" onclick="sendLC()" id="sbtn">Senden ➤</button></div>
+    </div>
+    <div style="background:var(--dark);border-top:1px solid var(--border);padding:11px 18px;flex-shrink:0">
+      <div class="lcl" style="margin-bottom:7px">📝 Interne Notizen</div>
+      <textarea id="noteInput" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--text);font-size:13px;resize:none;height:60px;outline:none" placeholder="Notizen zu diesem Lead..." onblur="saveNote('${sid}')">${notes[sid]||''}</textarea>
+    </div>`;
   document.getElementById('chat').innerHTML=h;
   setTimeout(()=>{const w=document.getElementById('mw');if(w)w.scrollTop=w.scrollHeight},50);
 }
 
 function toggleLC(){const lc=document.getElementById('lc');lc.classList.toggle('vis');document.getElementById('lcbtn').textContent=lc.classList.contains('vis')?'✕ Schließen':'💬 Live Chat'}
 function lcKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendLC()}}
+function saveNote(sid){
+  const note=document.getElementById('noteInput').value.trim();
+  if(note){
+    notes[sid]=note;
+    localStorage.setItem('1ai_notes',JSON.stringify(notes));
+    toast('📝 Gespeichert','Notiz wurde gespeichert');
+  }else{
+    delete notes[sid];
+    localStorage.setItem('1ai_notes',JSON.stringify(notes));
+  }
+}
 async function sendLC(){
   const inp=document.getElementById('lci'),msg=inp.value.trim();
   if(!msg)return;
@@ -355,6 +579,245 @@ function fDate(ts){if(!ts)return'';try{const d=new Date(ts),t=new Date();if(d.to
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
 function emptyHTML(){return`<div class="empty"><div class="ei">⚡</div><div class="et">Command Center bereit</div><div style="font-size:13px;color:var(--text-muted)">Wähle eine Konversation</div><div class="eg">1Ai-Agency · All Rights Reserved</div></div>`}
 function toast(t,m){document.getElementById('tttl').textContent=t;document.getElementById('tmsg').textContent=m;const el=document.getElementById('toast');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500)}
+
+function showTopQ(){
+  const qMap={};
+  allData.forEach(r=>{
+    if(r.um){
+      const q=r.um.toLowerCase().trim();
+      qMap[q]=(qMap[q]||0)+1;
+    }
+  });
+  const sorted=Object.keys(qMap).sort((a,b)=>qMap[b]-qMap[a]).slice(0,10);
+  const html=sorted.map((q,i)=>`
+    <div style="padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px">#${i+1}</div>
+          <div style="font-size:13px;color:var(--text)">${q.substring(0,80)}${q.length>80?'...':''}</div>
+        </div>
+        <div style="background:var(--gold);color:#000;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-left:12px">${qMap[q]}×</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('topQList').innerHTML=html||'<div style="text-align:center;color:var(--text-muted);padding:20px">Noch keine Fragen vorhanden</div>';
+  document.getElementById('topQModal').classList.add('open');
+}
+
+function showTeam(){
+  const assigned={};
+  Object.keys(assignments).forEach(sid=>{
+    const aid=assignments[sid];
+    assigned[aid]=(assigned[aid]||0)+1;
+  });
+  const html=teamMembers.map((m,i)=>`
+    <div style="padding:14px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px">${m.name}</div>
+        <div style="font-size:12px;color:var(--text-dim)">${assigned[m.id]||0} aktive Chats</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="width:8px;height:8px;background:${m.online?'var(--green)':'var(--text-muted)'};border-radius:50%"></div>
+        ${i>0?`<button onclick="removeTeamMember('${m.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px">✕</button>`:''}
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('teamList').innerHTML=html;
+  document.getElementById('teamModal').classList.add('open');
+}
+
+function addTeamMember(){
+  const name=prompt('Name des Team Mitglieds:');
+  if(!name||!name.trim())return;
+  teamMembers.push({id:Date.now().toString(),name:name.trim(),online:true,chats:0});
+  localStorage.setItem('1ai_team',JSON.stringify(teamMembers));
+  showTeam();
+  toast('👥 Hinzugefügt',name+' wurde zum Team hinzugefügt');
+}
+
+function removeTeamMember(id){
+  if(!confirm('Mitglied wirklich entfernen?'))return;
+  teamMembers=teamMembers.filter(m=>m.id!==id);
+  localStorage.setItem('1ai_team',JSON.stringify(teamMembers));
+  showTeam();
+  toast('👥 Entfernt','Mitglied wurde entfernt');
+}
+
+function showRankings(){
+  const sids=Object.keys(sessions).filter(s=>!deleted.has(s));
+  const sorted=sids.sort((a,b)=>sessions[b].score-sessions[a].score);
+  const top10=sorted.slice(0,10);
+  const bottom10=sorted.slice(-10).reverse();
+  
+  const avgScore=sids.length>0?Math.round(sids.reduce((sum,sid)=>sum+sessions[sid].score,0)/sids.length):0;
+  const highQuality=sids.filter(sid=>sessions[sid].quality==='high').length;
+  
+  const renderSession=(sid,rank,isTop)=>{
+    const s=sessions[sid];
+    const qColor=s.quality==='high'?'var(--green)':s.quality==='medium'?'var(--orange)':'var(--red)';
+    const qIcon=s.quality==='high'?'🟢':s.quality==='medium'?'🟡':'🔴';
+    const msgCount=s.msgs.filter(m=>m.um).length;
+    return`<div style="padding:14px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:14px;flex:1">
+        <div style="font-size:20px;font-weight:900;color:${isTop?'var(--gold)':'var(--text-muted)'};min-width:30px">#${rank}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">${sid.substring(0,16)}...</div>
+          <div style="font-size:11px;color:var(--text-dim)">${msgCount} Nachrichten · ${fDate(s.ft)}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="text-align:right">
+          <div style="font-size:24px;font-weight:900;color:${qColor}">${s.score}</div>
+          <div style="font-size:10px;color:var(--text-muted)">Score</div>
+        </div>
+        <div style="font-size:20px">${qIcon}</div>
+      </div>
+    </div>`;
+  };
+  
+  const html=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--gold)">${avgScore}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Ø Score</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--green)">${highQuality}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">High Quality</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--gold)">${Math.round((highQuality/Math.max(sids.length,1))*100)}%</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Quality Rate</div>
+      </div>
+    </div>
+    <h3 style="font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:700">🏆 Top 10 Sessions</h3>
+    ${top10.map((sid,i)=>renderSession(sid,i+1,true)).join('')}
+    <h3 style="font-size:16px;color:var(--red);margin:30px 0 12px 0;font-weight:700">⚠️ Bottom 10 Sessions</h3>
+    ${bottom10.map((sid,i)=>renderSession(sid,sorted.length-i,false)).join('')}
+  `;
+  
+  document.getElementById('rankingsList').innerHTML=html;
+  document.getElementById('rankingsModal').classList.add('open');
+}
+
+function showAIOptimization(){
+  const sids=Object.keys(sessions).filter(s=>!deleted.has(s));
+  
+  // Analyze bot responses
+  const botResponses=[];
+  const successfulResponses=[];
+  const failedResponses=[];
+  
+  sids.forEach(sid=>{
+    const s=sessions[sid];
+    const isSuccess=s.quality==='high'||statuses[sid]==='closed';
+    s.msgs.forEach(m=>{
+      if(m.br){
+        const clean=m.br.replace(/<<<JSON_START>>>[\s\S]*?<<<JSON_END>>>/g,'').trim();
+        if(clean){
+          botResponses.push({text:clean,success:isSuccess,score:s.score});
+          if(isSuccess)successfulResponses.push(clean);
+          else failedResponses.push(clean);
+        }
+      }
+    });
+  });
+  
+  // Word frequency analysis
+  const wordMap={};
+  const successWords={};
+  const failWords={};
+  
+  botResponses.forEach(r=>{
+    const words=r.text.toLowerCase().split(/\s+/).filter(w=>w.length>3);
+    words.forEach(w=>{
+      wordMap[w]=(wordMap[w]||0)+1;
+      if(r.success)successWords[w]=(successWords[w]||0)+1;
+      else failWords[w]=(failWords[w]||0)+1;
+    });
+  });
+  
+  // Find trigger words (words that appear more in successful conversations)
+  const triggerWords=Object.keys(successWords)
+    .filter(w=>successWords[w]>=3)
+    .map(w=>({
+      word:w,
+      successCount:successWords[w],
+      failCount:failWords[w]||0,
+      ratio:successWords[w]/(failWords[w]||1)
+    }))
+    .sort((a,b)=>b.ratio-a.ratio)
+    .slice(0,10);
+  
+  // Best performing responses
+  const topResponses=botResponses
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,5);
+  
+  // Stats
+  const avgResponseLength=botResponses.length>0
+    ?Math.round(botResponses.reduce((sum,r)=>sum+r.text.length,0)/botResponses.length)
+    :0;
+  const successRate=botResponses.length>0
+    ?Math.round((successfulResponses.length/botResponses.length)*100)
+    :0;
+  
+  const html=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--gold)">${botResponses.length}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Bot Responses</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--green)">${successRate}%</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Success Rate</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:var(--gold)">${avgResponseLength}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Ø Zeichen</div>
+      </div>
+    </div>
+    
+    <h3 style="font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:700">🔥 Top 10 Trigger Words</h3>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">Wörter die in erfolgreichen Chats häufiger vorkommen</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:30px">
+      ${triggerWords.map(w=>`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--gold)">${w.word}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">${w.successCount}× in Success</div>
+          </div>
+          <div style="background:var(--green);color:#000;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">${Math.round(w.ratio*100)}%</div>
+        </div>
+      `).join('')}
+    </div>
+    
+    <h3 style="font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:700">⭐ Best Performing Responses</h3>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">Die Bot-Antworten mit den höchsten Quality Scores</p>
+    ${topResponses.map((r,i)=>`
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:11px;color:var(--gold);font-weight:700">#${i+1} Best Response</div>
+          <div style="background:var(--gold);color:#000;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">Score: ${r.score}</div>
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">${r.text.substring(0,200)}${r.text.length>200?'...':''}</div>
+      </div>
+    `).join('')}
+    
+    <div style="background:#1a1500;border:1px solid #3a2e00;border-radius:10px;padding:20px;margin-top:30px">
+      <h4 style="font-size:14px;color:var(--gold);margin-bottom:10px;font-weight:700">💡 Optimization Empfehlungen:</h4>
+      <ul style="font-size:13px;color:var(--text);line-height:1.8;margin-left:20px">
+        <li>Verwende die Trigger Words häufiger in deinen Prompts</li>
+        <li>Optimale Response-Länge: ${avgResponseLength} Zeichen</li>
+        <li>${successRate<70?'⚠️ Success Rate unter 70% - überarbeite deinen Prompt!':'✅ Gute Success Rate - weiter so!'}</li>
+        <li>Analysiere die Best Performing Responses und übernehme den Stil</li>
+      </ul>
+    </div>
+  `;
+  
+  document.getElementById('aiOptContent').innerHTML=html;
+  document.getElementById('aiOptModal').classList.add('open');
+}
 
 if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
 loadData();setAR();
