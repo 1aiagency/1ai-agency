@@ -11,39 +11,91 @@
 <link rel="apple-touch-icon" href="icon-512.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <title>1Ai-Agency – Command Center</title>
+
 <style>
 :root{--black:#0a0a0a;--dark:#111;--card:#181818;--border:#2a2a2a;--gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:#8a6d2f;--text:#f0f0f0;--text-dim:#888;--text-muted:#555;--green:#2ecc71;--blue:#3498db;--red:#e74c3c;--orange:#f39c12}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;background:var(--black);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;max-width:100vw}
 
 /* HEADER */
-.header{background:var(--dark);border-bottom:1px solid var(--border);border-right:none;padding:0 20px 0 80px;height:58px;display:flex;align-items:center;gap:8px;flex-shrink:0;-webkit-app-region:drag;box-sizing:border-box;width:100%}
-.header *{-webkit-app-region:no-drag}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000}
-.logo-text{font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-sub{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
-.header-mid{flex:1;display:flex;justify-content:center}
-.client-sel{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;position:relative;transition:border-color .2s}
+.header{
+  background:var(--dark);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  height:58px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+  box-sizing:border-box;
+  width:100%;
+}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}
+.logo img{height:36px;width:auto;margin-left:0;display:block}
+.logo-text{
+  font-size:15px;font-weight:700;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap;
+}
+.logo-sub{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.header-mid{flex:1;display:flex;justify-content:center;min-width:0}
+.client-sel{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;position:relative;transition:border-color .2s;max-width:520px;min-width:220px}
 .client-sel:hover{border-color:var(--gold-dim)}
 .cdot{width:7px;height:7px;background:var(--green);border-radius:50%}
-.c-dd{display:none;position:absolute;top:110%;left:auto;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:240px;z-index:999;overflow:hidden}
+.c-dd{display:none;position:absolute;top:110%;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:240px;z-index:999;overflow:hidden}
 .c-dd.open{display:block}
 .c-item{padding:10px 14px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;transition:background .15s}
 .c-item:hover{background:var(--border)}
 .c-item.active{color:var(--gold)}
 .c-add{padding:10px 14px;font-size:12px;color:var(--gold);border-top:1px solid var(--border);cursor:pointer}
 .c-add:hover{background:var(--border)}
-.header-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:1;overflow:hidden;min-width:0}
+
+.header-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
 .rc{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--text-dim);flex-shrink:0}
 .rc select{background:transparent;border:none;color:var(--gold);font-size:12px;outline:none;cursor:pointer}
 .rc select option{background:var(--card)}
-.cd{font-size:11px;color:var(--gold-dim);min-width:28px}
-.btn{padding:7px 15px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:5px}
+.btn{padding:7px 15px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000}
 .btn-gold:hover{opacity:.9;transform:translateY(-1px)}
 .btn-out{background:transparent;border:1px solid var(--border);color:var(--text-dim)}
 .btn-out:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+/* MOBILE HEADER CONTROLS */
+.mmb{display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;line-height:1;padding:8px 10px;border-radius:10px;border:1px solid transparent}
+.mmb:hover{border-color:var(--border);background:rgba(255,255,255,.03)}
+.mob-actions{display:none;align-items:center;gap:8px;margin-left:auto}
+.mob-btn{
+  background:var(--card);border:1px solid var(--border);color:var(--text);
+  height:36px;min-width:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;
+  padding:0 10px;font-size:13px;font-weight:700;
+}
+.mob-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.mob-dd{
+  display:none;position:absolute;top:58px;right:12px;
+  width:min(92vw, 360px);
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  z-index:2500;overflow:hidden;box-shadow:0 18px 55px rgba(0,0,0,.65);
+}
+.mob-dd.open{display:block}
+.mob-dd .row{padding:12px 14px;border-bottom:1px solid var(--border)}
+.mob-dd .row:last-child{border-bottom:none}
+.mob-dd .ttl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:800;margin-bottom:8px}
+.mob-dd .actions{display:flex;flex-wrap:wrap;gap:8px}
+.mob-dd .act{
+  flex:1;min-width:120px;
+  padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;color:var(--text);font-weight:700;font-size:13px;
+  display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+}
+.mob-dd .act:hover{border-color:var(--gold-dim);color:var(--gold)}
+.mob-dd select{
+  width:100%;background:var(--dark);border:1px solid var(--border);
+  border-radius:10px;padding:10px 12px;color:var(--gold);
+  font-size:14px;outline:none;
+}
 
 /* STATS */
 .stats{background:var(--dark);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;gap:6px;flex-shrink:0}
@@ -146,12 +198,120 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .spin{width:17px;height:17px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold-dim)}
-@media(max-width:768px){.sidebar{width:100%;position:absolute;z-index:100;height:100%;transform:translateX(-100%);transition:transform .3s}.sidebar.open{transform:translateX(0)}.stats{display:none}.mmb{display:flex!important}}
-.mmb{display:none;background:none;border:none;color:var(--text);font-size:19px;cursor:pointer}
+
+/* Sidebar Backdrop */
+.sb-backdrop{
+  display:none;
+  position:fixed;
+  inset:56px 0 0 0; /* under mobile header */
+  background:rgba(0,0,0,.55);
+  z-index:1100;
+  backdrop-filter: blur(2px);
+}
+.sb-backdrop.open{display:block}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+
+  /* ============ MOBILE HEADER (STABLE) ============ */
+  .header{
+    padding:0 12px;
+    height:56px;
+    display:flex;
+    align-items:center;
+    gap:0;
+    position:relative;
+  }
+
+  .mmb{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+  }
+
+  .logo{
+    display:flex;
+    align-items:center;
+    flex:1;
+    min-width:0;
+    gap:0;
+  }
+
+  .logo img{
+    height:28px;
+    width:28px;
+    object-fit:contain;
+    margin-left:6px;
+    margin-right:10px;
+    flex:0 0 28px;
+  }
+
+  .logo > div{
+    flex:1;
+    min-width:0;
+  }
+
+  .logo-text{
+    font-size:13px;
+    line-height:1.1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .logo-sub{
+    font-size:8px;
+    letter-spacing:1.6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* Hide desktop selector + actions */
+  .header-mid{display:none}
+  .header-right{display:none}
+
+  /* Show mobile actions */
+  .mob-actions{display:flex;gap:8px;flex:0 0 auto}
+
+  /* Stats hidden */
+  .stats{display:none}
+
+  /* Sidebar becomes overlay */
+  .sidebar{
+    width:86vw;max-width:360px;
+    position:fixed;left:0;top:56px;bottom:0;
+    z-index:1200;height:auto;
+    transform:translateX(-110%);
+    transition:transform .28s ease;
+    border-right:1px solid var(--border);
+  }
+  .sidebar.open{transform:translateX(0)}
+
+  .main{position:relative}
+  .chat{width:100%}
+  .bub{max-width:82%}
+
+  /* prevent background scroll when sidebar open */
+  body.sidebar-open{overflow:hidden;}
+
+  /* drag state */
+  .sidebar.dragging{ transition:none !important; }
+  .sb-backdrop.dragging{ transition:none !important; }
+}
+
+/* Desktop: hide hamburger + mobile actions */
+@media(min-width:769px){
+  .mmb{display:none}
+  .mob-actions{display:none}
+}
 </style>
 </head>
-<body>
 
+<body>
 <div class="toast" id="toast">
   <div style="font-size:18px">🔔</div>
   <div><div class="tttl" id="tttl"></div><div class="tmsg" id="tmsg"></div></div>
@@ -221,12 +381,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   </div>
 </div>
 
+<!-- HEADER -->
 <div class="header">
-  <button class="mmb" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+  <!-- Mobile Hamburger -->
+  <button class="mmb" aria-label="Menü" onclick="toggleSidebar()">☰</button>
+
   <div class="logo">
-    <img src="logo.png" style="height:36px;width:auto;margin-left:8px">
-    <div><div class="logo-text">1Ai-Agency</div><div class="logo-sub">Command Center</div></div>
+    <img src="logo.png" alt="Logo">
+    <div style="min-width:0">
+      <div class="logo-text">1Ai-Agency</div>
+      <div class="logo-sub">Command Center</div>
+    </div>
   </div>
+
+  <!-- Desktop Client Selector -->
   <div class="header-mid">
     <div class="client-sel" id="csel" onclick="toggleDD()">
       <div class="cdot"></div>
@@ -238,6 +406,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       </div>
     </div>
   </div>
+
+  <!-- Desktop Actions -->
   <div class="header-right">
     <button class="btn btn-out" onclick="showAIOptimization()" style="font-size:11px;padding:6px 12px">🤖 AI Insights</button>
     <button class="btn btn-out" onclick="showRankings()" style="font-size:11px;padding:6px 12px">🏆 Rankings</button>
@@ -252,10 +422,56 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
         <option value="1800">30 Min</option>
       </select>
     </div>
-    <button class="btn btn-gold" onclick="loadData()" style="font-size:11px;padding:6px 10px;white-space:nowrap;flex-shrink:0">↻ Aktualisieren</button>
+    <button class="btn btn-gold" onclick="loadData()" style="font-size:11px;padding:6px 10px">↻ Aktualisieren</button>
+  </div>
+
+  <!-- Mobile Actions -->
+  <div class="mob-actions">
+    <button class="mob-btn" title="Aktualisieren" onclick="loadData()">↻</button>
+    <button class="mob-btn" title="Menü" onclick="toggleMobileMenu()">⋯</button>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div class="mob-dd" id="mobDD">
+    <div class="row">
+      <div class="ttl">Client</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1;display:flex;gap:8px;align-items:center;background:var(--dark);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+          <div class="cdot"></div>
+          <div style="font-weight:800;color:var(--gold);font-size:13px" id="cnameMob">1Ai-Agency (Haupt)</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="act" onclick="openClientPicker()">🔽 Client wählen</button>
+        <button class="act" onclick="openModalFromMobile()">＋ Kunden</button>
+      </div>
+      <div id="mobClientPicker" style="margin-top:10px;display:none"></div>
+    </div>
+
+    <div class="row">
+      <div class="ttl">Tools</div>
+      <div class="actions">
+        <button class="act" onclick="showAIOptimization(); closeMobileMenu()">🤖 AI Insights</button>
+        <button class="act" onclick="showRankings(); closeMobileMenu()">🏆 Rankings</button>
+        <button class="act" onclick="showTeam(); closeMobileMenu()">👥 Team</button>
+        <button class="act" onclick="showTopQ(); closeMobileMenu()">❓ Top 10</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="ttl">Auto Refresh</div>
+      <select id="rintMob" onchange="setARFromMobile()">
+        <option value="0">Aus</option>
+        <option value="60">1 Min</option>
+        <option value="300" selected>5 Min</option>
+        <option value="600">10 Min</option>
+        <option value="1800">30 Min</option>
+      </select>
+    </div>
   </div>
 </div>
 
+<!-- STATS -->
 <div class="stats">
   <div class="sc"><div class="si">💬</div><div><div class="sn" id="s1">–</div><div class="sl">Nachrichten</div></div></div>
   <div class="sc"><div class="si">👥</div><div><div class="sn" id="s2">–</div><div class="sl">Sessions</div></div></div>
@@ -267,7 +483,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <div class="sc"><div class="si">⏰</div><div><div class="sn" id="s8">–</div><div class="sl">Avg Duration</div></div></div>
   <div class="sc"><div class="si">📉</div><div><div class="sn" id="s9">–</div><div class="sl">Drop-off</div></div></div>
   <div class="sc"><div class="si">🔥</div><div><div class="sn" id="s10">–</div><div class="sl">Peak Hour</div></div></div>
-  
 </div>
 
 <div class="main">
@@ -282,6 +497,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     </div>
     <div class="sl2" id="sl2"><div class="loading"><div class="spin"></div> Lade...</div></div>
   </div>
+
+  <!-- Backdrop for mobile sidebar -->
+  <div class="sb-backdrop" id="sbBackdrop" onclick="closeSidebar()"></div>
+
   <div class="chat" id="chat">
     <div class="empty"><div class="ei">⚡</div><div class="et">Command Center bereit</div><div style="font-size:13px;color:var(--text-muted)">Wähle eine Konversation</div><div class="eg">1Ai-Agency · All Rights Reserved</div></div>
   </div>
@@ -298,13 +517,106 @@ let teamMembers=JSON.parse(localStorage.getItem('1ai_team')||'null')||[
   {id:'you',name:'Du',online:true,chats:0}
 ];
 
+/* ---------- MOBILE UI HELPERS ---------- */
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sbBackdrop').classList.add('open');
+  document.body.classList.add('sidebar-open');
+  closeMobileMenu();
+}
+function closeSidebar(){
+  const sb=document.getElementById('sidebar');
+  const bd=document.getElementById('sbBackdrop');
+  sb.classList.remove('open');
+  bd.classList.remove('open');
+  document.body.classList.remove('sidebar-open');
+  // clean inline styles if drag used
+  sb.style.transform='';
+  bd.style.display='';
+  bd.style.background='';
+  sb.classList.remove('dragging');
+  bd.classList.remove('dragging');
+}
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  if(sb.classList.contains('open')) closeSidebar();
+  else openSidebar();
+}
+
+function toggleMobileMenu(){
+  const el=document.getElementById('mobDD');
+  el.classList.toggle('open');
+  document.getElementById('cnameMob').textContent = clients[ci]?.name || '—';
+  const rint=document.getElementById('rint');
+  const rintMob=document.getElementById('rintMob');
+  if(rint && rintMob) rintMob.value = rint.value;
+}
+function closeMobileMenu(){
+  const dd=document.getElementById('mobDD');
+  if(dd) dd.classList.remove('open');
+  const picker=document.getElementById('mobClientPicker');
+  if(picker){ picker.style.display='none'; picker.innerHTML=''; }
+}
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('mobDD');
+  if(dd && dd.classList.contains('open')){
+    const inside = e.target.closest('#mobDD') || e.target.closest('.mob-actions');
+    if(!inside) closeMobileMenu();
+  }
+});
+
+function openClientPicker(){
+  const box=document.getElementById('mobClientPicker');
+  if(!box) return;
+  if(box.style.display==='block'){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='block';
+  box.innerHTML = `
+    <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      ${clients.map((c,i)=>`
+        <div onclick="swClient(${i}); closeMobileMenu();" style="padding:12px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;background:${i===ci?'#1e1a0e':'transparent'};border-bottom:1px solid var(--border)">
+          <div class="cdot" style="background:${i===ci?'var(--gold)':'var(--text-muted)'}"></div>
+          <div style="font-weight:800;color:${i===ci?'var(--gold)':'var(--text)'};font-size:13px">${c.name}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function openModalFromMobile(){
+  closeMobileMenu();
+  document.getElementById('addModal').classList.add('open');
+}
+
+/* ---------- EXISTING LOGIC ---------- */
 function toggleDD(){document.getElementById('cdd').classList.toggle('open');renderCL()}
-document.addEventListener('click',e=>{if(!e.target.closest('#csel'))document.getElementById('cdd').classList.remove('open')});
-function renderCL(){document.getElementById('clist').innerHTML=clients.map((c,i)=>`<div class="c-item ${i===ci?'active':''}" onclick="swClient(${i})"><div class="cdot" style="background:${i===ci?'var(--gold)':'var(--text-muted)'}"></div>${c.name}</div>`).join('')}
-function swClient(i){ci=i;document.getElementById('cname').textContent=clients[i].name;document.getElementById('cdd').classList.remove('open');cur=null;loadData()}
+document.addEventListener('click',e=>{if(!e.target.closest('#csel')){const d=document.getElementById('cdd'); if(d) d.classList.remove('open')}});
+
+function renderCL(){
+  document.getElementById('clist').innerHTML=clients.map((c,i)=>`<div class="c-item ${i===ci?'active':''}" onclick="swClient(${i})"><div class="cdot" style="background:${i===ci?'var(--gold)':'var(--text-muted)'}"></div>${c.name}</div>`).join('');
+  const name = clients[ci]?.name || '—';
+  const cname = document.getElementById('cname'); if(cname) cname.textContent = name;
+  const cnameMob = document.getElementById('cnameMob'); if(cnameMob) cnameMob.textContent = name;
+}
+function swClient(i){
+  ci=i;
+  renderCL();
+  const d=document.getElementById('cdd'); if(d) d.classList.remove('open');
+  cur=null;
+  loadData();
+}
 function openModal(e){e.stopPropagation();document.getElementById('addModal').classList.add('open');document.getElementById('cdd').classList.remove('open')}
 function closeModal(){document.getElementById('addModal').classList.remove('open')}
-function saveClient(){const n=document.getElementById('nName').value.trim(),s=document.getElementById('nSheet').value.trim(),sn=document.getElementById('nSheetName').value.trim()||'ChatLogs',w=document.getElementById('nWebhook').value.trim();if(!n||!s){alert('Name und Sheet ID fehlen!');return}clients.push({id:Date.now(),name:n,sheetId:s,sheetName:sn,webhook:w});localStorage.setItem('1ai_c',JSON.stringify(clients));closeModal();toast('✅ Gespeichert',n+' hinzugefügt!')}
+function saveClient(){
+  const n=document.getElementById('nName').value.trim(),
+        s=document.getElementById('nSheet').value.trim(),
+        sn=document.getElementById('nSheetName').value.trim()||'ChatLogs',
+        w=document.getElementById('nWebhook').value.trim();
+  if(!n||!s){alert('Name und Sheet ID fehlen!');return}
+  clients.push({id:Date.now(),name:n,sheetId:s,sheetName:sn,webhook:w});
+  localStorage.setItem('1ai_c',JSON.stringify(clients));
+  closeModal();
+  toast('✅ Gespeichert',n+' hinzugefügt!');
+  renderCL();
+}
 
 async function loadData(){
   const c=clients[ci];
@@ -315,10 +627,16 @@ async function loadData(){
     if(j.error)throw new Error(j.error.message);
     const prev=allData.length;
     allData=(j.values||[]).slice(1).filter(r=>r[0]).map(r=>({ts:r[0]||'',sid:r[1]||'?',um:r[2]||'',br:r[3]||'',st:r[4]||'success'}));
-    if(prev>0&&allData.length>prev){const n=allData.length-prev;toast('🔔 Neue Nachricht!',n+' neue Nachricht'+(n>1?'en':'')+' eingegangen');if(Notification.permission==='granted')new Notification('1Ai-Agency',{body:n+' neue Nachricht'+(n>1?'en':'')})}
+    if(prev>0&&allData.length>prev){
+      const n=allData.length-prev;
+      toast('🔔 Neue Nachricht!',n+' neue Nachricht'+(n>1?'en':'')+' eingegangen');
+      if(Notification.permission==='granted')new Notification('1Ai-Agency',{body:n+' neue Nachricht'+(n>1?'en':'')});
+    }
     proc();updateStats();renderSessions();
     if(cur&&sessions[cur])openSession(cur,true);
-  }catch(e){document.getElementById('sl2').innerHTML=`<div class="loading">❌ ${e.message}</div>`}
+  }catch(e){
+    document.getElementById('sl2').innerHTML=`<div class="loading">❌ ${e.message}</div>`;
+  }
 }
 
 function proc(){
@@ -328,40 +646,34 @@ function proc(){
     sessions[r.sid].msgs.push(r);
     sessions[r.sid].lt=r.ts;
   });
-  
-  // Calculate Quality Scores
+
   Object.keys(sessions).forEach(sid=>{
     const s=sessions[sid];
     let score=0;
-    
-    // Engagement Score (0-30 points)
+
     const msgCount=s.msgs.filter(m=>m.um).length;
     score+=Math.min(msgCount*5,30);
-    
-    // Completion Score (0-25 points)
+
     const hasResponse=s.msgs.length>=2&&s.msgs[s.msgs.length-1].br;
     if(hasResponse)score+=25;
-    
-    // Response Quality Score (0-20 points)
+
     const avgMsgLength=s.msgs.filter(m=>m.um).reduce((sum,m)=>(m.um?.length||0)+sum,0)/Math.max(msgCount,1);
     if(avgMsgLength>20)score+=20;
     else if(avgMsgLength>10)score+=10;
-    
-    // Duration Score (0-15 points)
+
     try{
       const duration=(new Date(s.lt).getTime()-new Date(s.ft).getTime())/60000;
       if(duration>2&&duration<20)score+=15;
       else if(duration>1)score+=10;
     }catch{}
-    
-    // Success Score (0-10 points)
+
     const allSuccess=s.msgs.every(m=>!m.st||m.st==='success');
     if(allSuccess)score+=10;
-    
+
     sessions[sid].score=Math.min(score,100);
     sessions[sid].quality=score>=70?'high':score>=40?'medium':'low';
   });
-  
+
   filtered=Object.keys(sessions).filter(s=>!deleted.has(s));
 }
 
@@ -375,9 +687,7 @@ function updateStats(){
   document.getElementById('s5').textContent=sids.filter(s=>statuses[s]==='closed').length;
   const sc=allData.filter(r=>!r.st||r.st==='success').length;
   document.getElementById('s6').textContent=allData.length>0?Math.round(sc/allData.length*100)+'%':'–';
-  
-  // Advanced Stats
-  // Response Time
+
   let respTimes=[];
   sids.forEach(sid=>{
     const msgs=sessions[sid].msgs;
@@ -393,8 +703,7 @@ function updateStats(){
   });
   const avgResp=respTimes.length>0?Math.round(respTimes.reduce((a,b)=>a+b,0)/respTimes.length):0;
   document.getElementById('s7').textContent=avgResp>0?avgResp+'s':'–';
-  
-  // Chat Duration
+
   let durations=[];
   sids.forEach(sid=>{
     try{
@@ -405,8 +714,7 @@ function updateStats(){
   });
   const avgDur=durations.length>0?Math.round(durations.reduce((a,b)=>a+b,0)/durations.length):0;
   document.getElementById('s8').textContent=avgDur>0?avgDur+'min':'–';
-  
-  // Drop-off Rate
+
   const totalConv=sids.length;
   const completed=sids.filter(s=>{
     const msgs=sessions[s].msgs;
@@ -414,8 +722,7 @@ function updateStats(){
   }).length;
   const dropOff=totalConv>0?Math.round(((totalConv-completed)/totalConv)*100):0;
   document.getElementById('s9').textContent=dropOff+'%';
-  
-  // Peak Hour
+
   const hours={};
   allData.forEach(r=>{
     try{
@@ -426,11 +733,6 @@ function updateStats(){
   let peak=0,peakH=0;
   Object.keys(hours).forEach(h=>{if(hours[h]>peak){peak=hours[h];peakH=h}});
   document.getElementById('s10').textContent=peakH>0?peakH+':00':'–';
-  
-  // Conversion Rate
-  const qualified=sids.filter(s=>statuses[s]==='closed').length;
-  const convRate=totalConv>0?Math.round((qualified/totalConv)*100):0;
-  if(document.getElementById('s11'))document.getElementById('s11').textContent=convRate+'%';
 }
 
 function setFilter(f,el){filter=f;document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderSessions()}
@@ -446,7 +748,6 @@ function renderSessions(){
   cont.innerHTML=sids.map(sid=>{
     const s=sessions[sid],lm=s.msgs[s.msgs.length-1],mc=s.msgs.filter(m=>m.um).length,pr=lm.um||'...',st=statuses[sid]||'open',isR=read.has(sid);
     const assignedTo=assignments[sid]?teamMembers.find(t=>t.id===assignments[sid])?.name||'Unbekannt':null;
-    const qColor=s.quality==='high'?'var(--green)':s.quality==='medium'?'var(--orange)':'var(--red)';
     const qIcon=s.quality==='high'?'🟢':s.quality==='medium'?'🟡':'🔴';
     return`<div class="si3 ${cur===sid?'active':''}" onclick="openSession('${sid}')">
       <div class="sav">👤</div>
@@ -470,7 +771,7 @@ function renderSessions(){
           </div>
         </div>
       </div>
-    </div>`}).join('')
+    </div>`}).join('');
 }
 
 function cycleStatus(e,sid){e.stopPropagation();const cy={'open':'contacted','contacted':'closed','closed':'open'};statuses[sid]=cy[statuses[sid]||'open'];localStorage.setItem('1ai_st',JSON.stringify(statuses));renderSessions();updateStats();const lb={'open':'Offen','contacted':'Kontaktiert','closed':'Abgeschlossen'};toast('📋 Status',`→ ${lb[statuses[sid]]}`)}
@@ -512,6 +813,12 @@ function openSession(sid,silent=false){
   cur=sid;
   if(!silent){read.add(sid);localStorage.setItem('1ai_r',JSON.stringify([...read]))}
   renderSessions();
+
+  // On mobile: close sidebar after selecting a session
+  if(window.matchMedia && window.matchMedia('(max-width: 768px)').matches){
+    closeSidebar();
+  }
+
   const s=sessions[sid],mc=s.msgs.filter(m=>m.um).length,c=clients[ci];
   let h=`<div class="ch"><div class="chav">👤</div><div class="chi"><h3>Session: ${sid.substring(0,12)}...</h3><p>${mc} Nachrichten · ${fDate(s.ft)} · ${c.name}</p></div><div class="cha"><button class="btn btn-out" onclick="toggleLC()" id="lcbtn">💬 Live Chat</button></div></div><div class="mw" id="mw">`;
   let ld='';
@@ -519,7 +826,10 @@ function openSession(sid,silent=false){
     const d=fDate(m.ts);
     if(d!==ld){h+=`<div class="dd"><span>${d}</span></div>`;ld=d}
     if(m.um)h+=`<div class="mr user"><div class="bub user"><div class="bs">👤 Kunde</div><div class="bt">${esc(m.um)}</div><div class="btm">${fTime(m.ts)}</div></div></div>`;
-    if(m.br){const cl=m.br.replace(/<<<JSON_START>>>[\s\S]*?<<<JSON_END>>>/g,'').trim();if(cl)h+=`<div class="mr bot"><div class="bub bot"><div class="bs">🤖 1Ai Bot</div><div class="bt">${esc(cl)}</div><div class="btm">${fTime(m.ts)} ✓</div></div></div>`}
+    if(m.br){
+      const cl=m.br.replace(/<<<JSON_START>>>[\s\S]*?<<<JSON_END>>>/g,'').trim();
+      if(cl)h+=`<div class="mr bot"><div class="bub bot"><div class="bs">🤖 1Ai Bot</div><div class="bt">${esc(cl)}</div><div class="btm">${fTime(m.ts)} ✓</div></div></div>`;
+    }
   });
   h+=`</div>
     <div class="lc" id="lc">
@@ -571,14 +881,27 @@ function filterSessions(){
   renderSessions();
 }
 
-function setAR(){clearInterval(arTimer);clearInterval(cdTimer);document.getElementById('cd').textContent='';const s=parseInt(document.getElementById('rint').value);if(!s)return;cdVal=s;cdTimer=setInterval(()=>{cdVal--;document.getElementById('cd').textContent=cdVal+'s';if(cdVal<=0){cdVal=s;loadData()}},1000)}
-
+/* Auto refresh */
+function setAR(){
+  clearInterval(arTimer);clearInterval(cdTimer);
+  const s=parseInt(document.getElementById('rint').value);
+  if(!s)return;
+  cdVal=s;
+  cdTimer=setInterval(()=>{cdVal--; if(cdVal<=0){cdVal=s;loadData()}},1000);
+}
+function setARFromMobile(){
+  const v=document.getElementById('rintMob').value;
+  document.getElementById('rint').value=v;
+  setAR();
+  toast('⏱️ Auto Refresh', v==='0'?'Aus':'Aktiv');
+}
 function fTime(ts){if(!ts)return'';try{return new Date(ts).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}catch{return''}}
 function fDate(ts){if(!ts)return'';try{const d=new Date(ts),t=new Date();if(d.toDateString()===t.toDateString())return'Heute';return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}catch{return ts}}
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
 function emptyHTML(){return`<div class="empty"><div class="ei">⚡</div><div class="et">Command Center bereit</div><div style="font-size:13px;color:var(--text-muted)">Wähle eine Konversation</div><div class="eg">1Ai-Agency · All Rights Reserved</div></div>`}
 function toast(t,m){document.getElementById('tttl').textContent=t;document.getElementById('tmsg').textContent=m;const el=document.getElementById('toast');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500)}
 
+/* Existing feature modals (unchanged) */
 function showTopQ(){
   const qMap={};
   allData.forEach(r=>{
@@ -647,10 +970,10 @@ function showRankings(){
   const sorted=sids.sort((a,b)=>sessions[b].score-sessions[a].score);
   const top10=sorted.slice(0,10);
   const bottom10=sorted.slice(-10).reverse();
-  
+
   const avgScore=sids.length>0?Math.round(sids.reduce((sum,sid)=>sum+sessions[sid].score,0)/sids.length):0;
   const highQuality=sids.filter(sid=>sessions[sid].quality==='high').length;
-  
+
   const renderSession=(sid,rank,isTop)=>{
     const s=sessions[sid];
     const qColor=s.quality==='high'?'var(--green)':s.quality==='medium'?'var(--orange)':'var(--red)';
@@ -673,7 +996,7 @@ function showRankings(){
       </div>
     </div>`;
   };
-  
+
   const html=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
@@ -694,25 +1017,22 @@ function showRankings(){
     <h3 style="font-size:16px;color:var(--red);margin:30px 0 12px 0;font-weight:700">⚠️ Bottom 10 Sessions</h3>
     ${bottom10.map((sid,i)=>renderSession(sid,sorted.length-i,false)).join('')}
   `;
-  
   document.getElementById('rankingsList').innerHTML=html;
   document.getElementById('rankingsModal').classList.add('open');
 }
 
 function showAIOptimization(){
   const sids=Object.keys(sessions).filter(s=>!deleted.has(s));
-  
-  // Analyze bot responses
   const botResponses=[];
   const successfulResponses=[];
   const failedResponses=[];
-  
+
   sids.forEach(sid=>{
     const s=sessions[sid];
     const isSuccess=s.quality==='high'||statuses[sid]==='closed';
     s.msgs.forEach(m=>{
       if(m.br){
-        const clean=m.br.replace(/<<<JSON_START>>>[\s\S]*?<<<JSON_END>>>/g,'').trim();
+        const clean=m.br.replace(/<<<JSON_START>>>[\\s\\S]*?<<<JSON_END>>>/g,'').trim();
         if(clean){
           botResponses.push({text:clean,success:isSuccess,score:s.score});
           if(isSuccess)successfulResponses.push(clean);
@@ -721,46 +1041,31 @@ function showAIOptimization(){
       }
     });
   });
-  
-  // Word frequency analysis
-  const wordMap={};
-  const successWords={};
-  const failWords={};
-  
+
+  const successWords={},failWords={};
   botResponses.forEach(r=>{
-    const words=r.text.toLowerCase().split(/\s+/).filter(w=>w.length>3);
+    const words=r.text.toLowerCase().split(/\\s+/).filter(w=>w.length>3);
     words.forEach(w=>{
-      wordMap[w]=(wordMap[w]||0)+1;
       if(r.success)successWords[w]=(successWords[w]||0)+1;
       else failWords[w]=(failWords[w]||0)+1;
     });
   });
-  
-  // Find trigger words (words that appear more in successful conversations)
+
   const triggerWords=Object.keys(successWords)
     .filter(w=>successWords[w]>=3)
-    .map(w=>({
-      word:w,
-      successCount:successWords[w],
-      failCount:failWords[w]||0,
-      ratio:successWords[w]/(failWords[w]||1)
-    }))
+    .map(w=>({word:w,successCount:successWords[w],failCount:failWords[w]||0,ratio:successWords[w]/(failWords[w]||1)}))
     .sort((a,b)=>b.ratio-a.ratio)
     .slice(0,10);
-  
-  // Best performing responses
-  const topResponses=botResponses
-    .sort((a,b)=>b.score-a.score)
-    .slice(0,5);
-  
-  // Stats
+
+  const topResponses=botResponses.sort((a,b)=>b.score-a.score).slice(0,5);
+
   const avgResponseLength=botResponses.length>0
     ?Math.round(botResponses.reduce((sum,r)=>sum+r.text.length,0)/botResponses.length)
     :0;
   const successRate=botResponses.length>0
     ?Math.round((successfulResponses.length/botResponses.length)*100)
     :0;
-  
+
   const html=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:30px">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
@@ -776,7 +1081,7 @@ function showAIOptimization(){
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Ø Zeichen</div>
       </div>
     </div>
-    
+
     <h3 style="font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:700">🔥 Top 10 Trigger Words</h3>
     <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">Wörter die in erfolgreichen Chats häufiger vorkommen</p>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:30px">
@@ -790,7 +1095,7 @@ function showAIOptimization(){
         </div>
       `).join('')}
     </div>
-    
+
     <h3 style="font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:700">⭐ Best Performing Responses</h3>
     <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">Die Bot-Antworten mit den höchsten Quality Scores</p>
     ${topResponses.map((r,i)=>`
@@ -802,7 +1107,7 @@ function showAIOptimization(){
         <div style="font-size:13px;color:var(--text);line-height:1.6">${r.text.substring(0,200)}${r.text.length>200?'...':''}</div>
       </div>
     `).join('')}
-    
+
     <div style="background:#1a1500;border:1px solid #3a2e00;border-radius:10px;padding:20px;margin-top:30px">
       <h4 style="font-size:14px;color:var(--gold);margin-bottom:10px;font-weight:700">💡 Optimization Empfehlungen:</h4>
       <ul style="font-size:13px;color:var(--text);line-height:1.8;margin-left:20px">
@@ -813,13 +1118,129 @@ function showAIOptimization(){
       </ul>
     </div>
   `;
-  
   document.getElementById('aiOptContent').innerHTML=html;
   document.getElementById('aiOptModal').classList.add('open');
 }
 
+/* Notifications */
 if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
-loadData();setAR();
+
+/* ===== Sidebar Drag (mobile) ===== */
+(function initSidebarDrag(){
+  const sb = () => document.getElementById('sidebar');
+  const bd = () => document.getElementById('sbBackdrop');
+  const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+  let startX=0, startY=0;
+  let tracking=false;
+  let startOpen=false;
+  let maxW=0;
+
+  function setBackdropOpacity(pxOpen){
+    const o = Math.max(0, Math.min(1, pxOpen / maxW)) * 0.55;
+    const el = bd();
+    if(!el) return;
+    el.style.display = pxOpen > 0 ? 'block' : '';
+    el.style.background = `rgba(0,0,0,${o})`;
+  }
+
+  function setSidebarTranslate(pxOpen){
+    const tx = (-maxW + pxOpen);
+    sb().style.transform = `translateX(${tx}px)`;
+    setBackdropOpacity(pxOpen);
+  }
+
+  function beginDrag(open){
+    maxW = sb().getBoundingClientRect().width || 320;
+    sb().classList.add('dragging');
+    if(bd()) bd().classList.add('dragging');
+
+    if(bd()){
+      bd().style.display = 'block';
+      bd().classList.add('open');
+    }
+    document.body.classList.add('sidebar-open');
+    setSidebarTranslate(open ? maxW : 0);
+  }
+
+  function endDrag(shouldOpen){
+    sb().classList.remove('dragging');
+    if(bd()) bd().classList.remove('dragging');
+    if(bd()) bd().style.background = '';
+    if(shouldOpen) openSidebar();
+    else closeSidebar();
+    sb().style.transform = '';
+  }
+
+  document.addEventListener('touchstart',(e)=>{
+    if(!isMobile()) return;
+    const t=e.touches[0];
+    startX=t.clientX; startY=t.clientY;
+
+    const open = sb().classList.contains('open');
+    const nearLeftEdge = startX <= 12; // tighter edge zone
+    const insideSidebar = !!e.target.closest('#sidebar');
+
+    tracking = (!open && nearLeftEdge) || (open && insideSidebar) || (open && !!e.target.closest('#sbBackdrop'));
+    if(!tracking) return;
+
+    startOpen=open;
+    beginDrag(open);
+  }, {passive:true});
+
+  document.addEventListener('touchmove',(e)=>{
+    if(!tracking) return;
+    const t=e.touches[0];
+    const dx=t.clientX - startX;
+    const dy=Math.abs(t.clientY - startY);
+
+    if(dy > 50 && Math.abs(dx) < 20){
+      tracking=false;
+      endDrag(startOpen);
+      return;
+    }
+    if(Math.abs(dx) > 8) e.preventDefault();
+
+    let pxOpen = startOpen ? (maxW + dx) : dx;
+    pxOpen = Math.max(0, Math.min(maxW, pxOpen));
+    setSidebarTranslate(pxOpen);
+  }, {passive:false});
+
+  document.addEventListener('touchend',()=>{
+    if(!tracking) return;
+    tracking=false;
+
+    const rect = sb().getBoundingClientRect();
+    const pxOpen = rect.width + rect.left;
+    const shouldOpen = pxOpen >= (rect.width * 0.35);
+    endDrag(shouldOpen);
+  }, {passive:true});
+
+  window.addEventListener('resize',()=>{
+    if(isMobile()) return;
+    sb().style.transform='';
+    if(bd()){
+      bd().style.display='';
+      bd().style.background='';
+      bd().classList.remove('open');
+    }
+    document.body.classList.remove('sidebar-open');
+    sb().classList.remove('open');
+  });
+})();
+
+/* ESC closes overlays */
+document.addEventListener('keydown',(e)=>{
+  if(e.key === 'Escape'){
+    closeSidebar();
+    closeMobileMenu();
+  }
+});
+
+/* boot */
+renderCL();
+loadData();
+setAR();
 </script>
 </body>
 </html>
